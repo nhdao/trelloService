@@ -6,9 +6,10 @@
 const express = require('express')
 const { StatusCodes } = require('http-status-codes')
 const router = express.Router()
+const { boardValidation } = require('./../../validations/boardValidation')
 
-const { boardRoutes } = require('./boardRoutes')
+router.route('/')
+  .get()
+  .post(boardValidation.createNew)
 
-router.use('/boards', boardRoutes)
-
-export const APIs_V1 = router
+export const boardRoutes = router

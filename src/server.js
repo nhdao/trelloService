@@ -8,14 +8,16 @@
 const express = require('express')
 const { CONNECT_DB, GET_DB, CLOSE_DB } = require('./config/mongodb')
 const { env } = require('./config/environment')
+const { APIs_V1 } = require('./routes/v1')
 
 const START_SERVER = () => {
   const app = express()
 
-  app.get('/', async (req, res) => {
-    console.log(await GET_DB().listCollections().toArray())
-    res.end('Hello DB collections')
-  })
+  app.use(express.json({
+    
+  }))
+
+  app.use('/v1', APIs_V1)
 
   app.listen(env.APP_PORT, env.APP_HOST, () => {
     // eslint-disable-next-line no-console
