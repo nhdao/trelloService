@@ -4,16 +4,15 @@
  * "A bit of fragrance clings to the hand that gives flowers!"
  */
 const { StatusCodes } = require('http-status-codes')
+const { boardService } = require('./../services/boardService')
 
 const createNew = async (req, res, next) => {
   try {
-    res.status(StatusCodes.CREATED).json({
-      message: 'OK'
-    })
+
+    const createdBoard = await boardService.createNew(req.body)
+
+    res.status(StatusCodes.CREATED).json(createdBoard)
   } catch (err) {
-    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    //   errors: err.message
-    // })
     next(err)
   }
 }
