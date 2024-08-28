@@ -22,11 +22,7 @@ const createNew = async (req, res, next) => {
       abortEarly: false
     })
 
-    // next()
-
-    res.status(StatusCodes.CREATED).json({
-      message: 'OK'
-    })
+    next()
   } catch (err) {
     res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
       errors: new Error(err).message
