@@ -1,3 +1,3 @@
 export const WHITELISR_DOMAINS = [
-  'http://loclahost:3000/'
+  'http://loclahost:3000'
 ]
