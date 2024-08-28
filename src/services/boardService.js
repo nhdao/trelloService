@@ -2,6 +2,7 @@ const slugify = require('./../utils/formatter')
 const { boardModel } = require('./../models/boardModel')
 const { StatusCodes } = require('http-status-codes')
 const ApiError = require('./../utils/apiError')
+const { cloneDeep } = require('lodash')
 
 const createNew = async (reqBody) => {
   try {
@@ -29,6 +30,16 @@ const getDetail = async (id) => {
     if (!resultBoard) {
       throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     }
+
+    const responseBoard = cloneDeep(resultBoard)
+
+    responseBoard.columns.forEach(column => {
+      column.cards = responseBoard.cards.filter(card => {
+        card.columnId.toString() === column._id.toString()
+      })
+    })
+
+    delete responseBoard.cards
 
   } catch (err) {
     throw new Error(err)

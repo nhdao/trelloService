@@ -6,11 +6,13 @@
 const joi = require('joi')
 const { StatusCodes } = require('http-status-codes')
 const ApiError = require('./../utils/apiError')
+const { BOARD_TYPES } = require('./../utils/constants')
 
 const createNew = async (req, res, next) => {
   const correctCondition = joi.object({
     title: joi.string().required().min(3).max(50).trim().strict(),
-    description: joi.string().required().min(3).max(256).trim().strict()
+    description: joi.string().required().min(3).max(256).trim().strict(),
+    type: joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
 
     // trim() is used to cut trailing or leading spaces
     // must be followed by strict()
