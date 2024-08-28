@@ -11,9 +11,10 @@ const createNew = async (req, res, next) => {
       message: 'OK'
     })
   } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      errors: err.message
-    })
+    // res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    //   errors: err.message
+    // })
+    next(err)
   }
 }
 

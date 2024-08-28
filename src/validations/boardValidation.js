@@ -5,9 +5,9 @@
  */
 const joi = require('joi')
 const { StatusCodes } = require('http-status-codes')
+const ApiError = require('./../utils/apiError')
 
 const createNew = async (req, res, next) => {
-  
   const correctCondition = joi.object({
     title: joi.string().required().min(3).max(50).trim().strict(),
     description: joi.string().required().min(3).max(256).trim().strict()
@@ -22,11 +22,8 @@ const createNew = async (req, res, next) => {
       abortEarly: false
     })
 
-    next()
   } catch (err) {
-    res.status(StatusCodes.UNPROCESSABLE_ENTITY).json({
-      errors: new Error(err).message
-    })
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY), new Error(err).message)
   }
 }
 
