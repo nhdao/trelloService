@@ -10,9 +10,13 @@ const { CONNECT_DB, CLOSE_DB } = require('./config/mongodb')
 const { env } = require('./config/environment')
 const { APIs_V1 } = require('./routes/v1')
 const { errorHandlingMiddleware } = require('./middlewares/errorHandlingMiddleware')
+const cors = require('cors')
+const { corsOptions } = require('./utils/cors')
 
 const START_SERVER = () => {
   const app = express()
+
+  app.use(cors(corsOptions))
 
   app.use(express.json())
 
