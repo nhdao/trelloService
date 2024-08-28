@@ -2,6 +2,9 @@ const joi = require('joi')
 const { ObjectId } = require('mongodb')
 const { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } = require('./../utils/validators')
 const { GET_DB } = require('./../config/mongodb')
+const { BOARD_TYPES } = require('./../utils/constants')
+const { columnModel } = require('./columnModel')
+const { cardModel } = require('./cardModel')
 
 // Collection definition
 const BOARD_COLLECTION_NAME = 'boards'
@@ -9,6 +12,7 @@ const BOARD_COLLECTION_SCHEMA = joi.object({
   title: joi.string().required().min(3).max(50).trim().strict(),
   slug: joi.string().required().min(3).trim().strict(),
   description: joi.string().required().min(3).max(256).trim().strict(),
+  type: joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
   columnOrderIds: joi.array().items(joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)).default([]),
   createdAt: joi.date().timestamp('javascript').default(Date.now()),
   updatedAt: joi.date().timestamp('javascript').default(null),
@@ -22,8 +26,6 @@ const validateBeforeCreate = async (data) => {
 }
 
 const createNew = async (data) => {
-  const validData = validateBeforeCreate(data)
-
   try {
     const validData = validateBeforeCreate(data)
     const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
@@ -48,27 +50,42 @@ const findOneById = async (id) => {
 
 const getDetail = async (id) => {
   try {
-    const resultBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate({
-      $match: {
-        _id: ObjectId.createFromHexString(id)
+    const resultBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+      {
+        $match: {
+          _id: ObjectId.createFromHexString(id),
+          _destroy: false
+        }
       },
-      $lookup: {
-        from: 'columns',
-        localField: 'columnOrderIds',
-        foreignField: '_id',
-        as: 'columnOrderIds'
+      {
+        $lookup: {
+          from: columnModel.COLUMN_COLLECTION_NAME,
+          localField: '_id',
+          foreignField: 'boardId',
+          as: 'columns  '
+        }
       },
-      $project: {
-        _id: 0,
-        title: 1,
-        description: 1,
-        type: 1,
-        columnOrderIds: 1
+      {
+        $lookup: {
+          from: cardModel.CARD_COLLECTION_NAME,
+          localField: '_id',
+          foreignField: 'boardId',
+          as: 'cards  '
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          title: 1,
+          description: 1,
+          type: 1,
+          columns: 1,
+          cards: 1
+        }
       }
-    })
+    ]).toArray()
 
-    // Add aggregate function if needed
-    return resultBoard
+    return resultBoard[0] || {}
   } catch (err) {
     throw new Error(err)
   }
