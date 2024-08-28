@@ -1,5 +1,7 @@
 const slugify = require('./../utils/formatter')
 const { boardModel } = require('./../models/boardModel')
+const { StatusCodes } = require('http-status-codes')
+const ApiError = require('./../utils/apiError')
 
 const createNew = async (reqBody) => {
   try {
@@ -20,6 +22,20 @@ const createNew = async (reqBody) => {
   }
 }
 
+const getDetail = async (id) => {
+  try {
+    const resultBoard =  await boardModel.getDetail(id)
+
+    if (!resultBoard) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
+    }
+
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
 export const boardService = {
-  createNew
+  createNew,
+  getDetail
 }

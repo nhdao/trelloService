@@ -46,9 +46,30 @@ const findOneById = async (id) => {
   }
 }
 
+const getDetail = async (id) => {
+  try {
+    const resultBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate({
+      $match: {
+        _id: ObjectId.createFromHexString(id)
+      },
+      $lookup: {
+        from: 'columns',
+        localField: 'columnOrderIds',
+        foreignField: '_id'
+      }
+    })
+
+    // Add aggregate function if needed
+    return resultBoard
+  } catch (err) {
+    throw new Error(err)
+  }
+}
+
 export const boardModel = {
   BOARD_COLLECTION_NAME,
   BOARD_COLLECTION_SCHEMA,
   createNew,
-  findOneById
+  findOneById,
+  getDetail
 }
