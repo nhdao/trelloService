@@ -55,7 +55,15 @@ const getDetail = async (id) => {
       $lookup: {
         from: 'columns',
         localField: 'columnOrderIds',
-        foreignField: '_id'
+        foreignField: '_id',
+        as: 'columnOrderIds'
+      },
+      $project: {
+        _id: 0,
+        title: 1,
+        description: 1,
+        type: 1,
+        columnOrderIds: 1
       }
     })
 
