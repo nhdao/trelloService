@@ -25,9 +25,9 @@ const START_SERVER = () => {
     console.log(`Hello client, I am running at http://${ env.APP_HOST }:${ env.APP_PORT }`)
   })
 
-  process.on('SIGINT', () => {
+  process.on('SIGINT', async () => {
     console.log('Closing DB connection...')
-    CLOSE_DB()
+    await CLOSE_DB()
     console.log('Connection closed!!!')
   })
 }
