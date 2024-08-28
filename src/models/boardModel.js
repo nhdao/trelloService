@@ -1,4 +1,5 @@
 const joi = require('joi')
+const { ObjectId } = require('mongodb')
 const { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } = require('./../utils/validators')
 const { GET_DB } = require('./../config/mongodb')
 
@@ -14,9 +15,18 @@ const BOARD_COLLECTION_SCHEMA = joi.object({
   _destroy: joi.boolean().default(false)
 })
 
+const validateBeforeCreate = async (data) => {
+  return await BOARD_COLLECTION_SCHEMA.validateAsync(data, {
+    abortEarly: false
+  })
+}
+
 const createNew = async (data) => {
+  const validData = validateBeforeCreate(data)
+
   try {
-    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(data)
+    const validData = validateBeforeCreate(data)
+    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
 
     return createdBoard
   } catch (err) {
@@ -26,8 +36,8 @@ const createNew = async (data) => {
 
 const findOneById = async (id) => {
   try {
-    const foundBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneById({
-      _id: id
+    const foundBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
+      _id: ObjectId.createFromHexString(id)
     })
 
     return foundBoard
